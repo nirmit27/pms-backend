@@ -1,3 +1,5 @@
-# FastAPI Demo
+# Patient Management System 🏥
 
-Still working on my *"ability"* to compose a **README** file right off the top of my head. ;)
+A simple **Patient Management System** API backend powered by **Fast API**.
+
+> ⚠️ Under Construction ⚠️
