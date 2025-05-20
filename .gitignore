@@ -1,0 +1,14 @@
+# Cache
+**/__pycache__
+
+# Env. vars.
+*.env
+
+# Venv
+fastenv
+
+# Extras
+test.*
+
+# Data
+*.json
