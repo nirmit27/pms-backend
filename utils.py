@@ -1,4 +1,4 @@
-"""Utility functions and useful variables."""
+"""Utility functions and variables."""
 
 from json import load
 from os import environ
@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-FILEPATH: str = environ["FILEPATH"] or ""
+FILEPATH: str = environ.get("FILEPATH", "")
 
 valid_fields: list[str] = ["height", "weight", "bmi"]
 

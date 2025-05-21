@@ -9,3 +9,6 @@ fastenv
 
 # Extras
 test.*
+
+# Dirs.
+data
