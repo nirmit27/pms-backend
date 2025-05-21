@@ -9,6 +9,3 @@ fastenv
 
 # Extras
 test.*
-
-# Data
-*.json

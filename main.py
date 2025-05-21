@@ -1,4 +1,4 @@
-"""Root of the service."""
+"""Root of the microservice."""
 
 from fastapi import FastAPI, Path, HTTPException, Query
 
@@ -71,18 +71,20 @@ def sort_patients(
 ):
     if sort_by not in valid_fields:
         raise HTTPException(
-            status_code=400, detail=f"Invalid sorting field. Select from {valid_fields}."
+            status_code=400,
+            detail=f"Invalid sorting field. Select from {valid_fields}.",
         )
 
     if order not in ["asc", "desc"]:
         raise HTTPException(
-            status_code=400, detail="Invalid sorting order. Select either 'asc' or 'desc'."
+            status_code=400,
+            detail="Invalid sorting order. Select either 'asc' or 'desc'.",
         )
 
     data: dict[str, dict[str, str | int | float]] = load_data()
-    sort_order = True if order == "desc" else False
+    sort_order: bool = True if order == "desc" else False
 
-    sorted_data = sorted(
+    sorted_data: list[dict[str, str | int | float]] = sorted(
         data.values(), key=lambda x: x.get(sort_by, 0), reverse=sort_order
     )
 
