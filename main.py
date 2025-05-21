@@ -1,3 +1,5 @@
+"""Root of the service."""
+
 from fastapi import FastAPI, Path, HTTPException, Query
 
 from utils import load_data, valid_fields
@@ -37,7 +39,7 @@ def view_patient_by_id(
     )
 
 
-@app.get("/patient/name")
+@app.get("/patient/")
 def view_patients_by_name(
     patient_name: str = Query(
         ..., description="Patient name in the database.", example="John Doe"
@@ -62,18 +64,19 @@ def view_patients_by_name(
 @app.get("/sort")
 def sort_patients(
     sort_by: str = Query(
-        ..., description="Sort records on the basis of height, weight or bmi."
+        ...,
+        description="Sort records on the basis of height, weight or bmi.",
     ),
     order: str = Query("asc", description="Sort in ascending or descending order."),
 ):
     if sort_by not in valid_fields:
         raise HTTPException(
-            status_code=400, detail=f"Invalid field selected from {valid_fields}."
+            status_code=400, detail=f"Invalid sorting field. Select from {valid_fields}."
         )
 
     if order not in ["asc", "desc"]:
         raise HTTPException(
-            status_code=400, detail="Invalid order select between 'asc' and 'desc'."
+            status_code=400, detail="Invalid sorting order. Select either 'asc' or 'desc'."
         )
 
     data: dict[str, dict[str, str | int | float]] = load_data()
