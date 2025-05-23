@@ -1,4 +1,4 @@
-"""For MongoDB integration."""
+"""Database integration"""
 
 from os import environ
 from dotenv import load_dotenv
@@ -42,7 +42,7 @@ else:
         collection = None
 
 
-# Methods for CRUD operations
+# CRUD methods
 
 
 def get_all_patients() -> list[dict] | None:
@@ -53,7 +53,7 @@ def get_all_patients() -> list[dict] | None:
     return list(collection.find({}, {"_id": 0}))
 
 
-def get_patient_by_id(pid) -> dict | None:
+def get_patient_by_id(pid: str) -> dict | None:
     """Retrieves the patient record with the matching ID."""
     if collection is None:
         return None
@@ -61,7 +61,7 @@ def get_patient_by_id(pid) -> dict | None:
     return dict(collection.find({"pid": pid}, {"_id": 0}))
 
 
-def get_patients_by_name(name) -> list[dict] | None:
+def get_patients_by_name(name: str) -> list[dict] | None:
     """Retrieves the patient record(s) with the matching name."""
     if collection is None:
         return None
@@ -69,9 +69,9 @@ def get_patients_by_name(name) -> list[dict] | None:
     return list(collection.find({"name": name}, {"_id": 0}))
 
 
-def sort_records_by_param(sort_by, order) -> list[dict] | None:
+def sort_records_by_param(sort_by: str, reverse: bool) -> list[dict] | None:
     """Retrieves patient records sorted by given parameter value in specified order."""
     if collection is None:
         return None
 
-    return list(collection.find({}, {"_id": 0}).sort({sort_by: -1 if order else 1}))
+    return list(collection.find({}, {"_id": 0}).sort({sort_by: -1 if reverse else 1}))

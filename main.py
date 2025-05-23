@@ -1,4 +1,4 @@
-"""Root of the microservice."""
+"""Root of the microservice"""
 
 from fastapi import FastAPI, Path, HTTPException, Query
 
@@ -91,7 +91,7 @@ def sort_patients(
     if sort_by not in valid_fields:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid sorting field. Select from {valid_fields}.",
+            detail=f"Invalid sorting field. Select from {', '.join(valid_fields)}.",
         )
 
     if order not in ["asc", "desc"]:

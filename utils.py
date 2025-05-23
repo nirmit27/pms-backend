@@ -1,4 +1,4 @@
-"""Utility functions and variables."""
+"""Utility functions and variables"""
 
 from json import load
 from os import environ
