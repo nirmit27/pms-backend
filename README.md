@@ -33,7 +33,7 @@ uvicorn main:app --reload
 - As you make changes to the **Python scripts**, the server will automatically restart the application to reflect those changes, courtesy of the **`--reload`** flag appended to the command.
 
 ### 4. Deployment
-Follow the official documentation provided **[Railway](https://docs.railway.com/)** (suggested) for deploying this microservice.
+Follow the official documentation provided by **[Railway](https://docs.railway.com/)** (suggested) for deploying this microservice.
 
 
 ## Technologies
