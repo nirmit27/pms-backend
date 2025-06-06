@@ -45,6 +45,11 @@ else:
 # CRUD methods
 
 
+# CREATE operations
+...
+
+
+# READ operations
 def get_all_patients() -> list[dict] | None:
     """Retrieves all the patient records."""
     if collection is None:
@@ -53,12 +58,17 @@ def get_all_patients() -> list[dict] | None:
     return list(collection.find({}, {"_id": 0}))
 
 
-def get_patient_by_id(pid: str) -> dict | None:
+def get_patient_by_id(pid: str) -> dict | str | None:
     """Retrieves the patient record with the matching ID."""
     if collection is None:
         return None
 
-    return dict(collection.find({"pid": pid}, {"_id": 0}))
+    result = collection.find_one({"pid": pid}, {"_id": 0})
+
+    if result is None:
+        return f"Patient with PID '{pid}' does not exist."
+
+    return result
 
 
 def get_patients_by_name(name: str) -> list[dict] | None:
@@ -75,3 +85,11 @@ def sort_records_by_param(sort_by: str, reverse: bool) -> list[dict] | None:
         return None
 
     return list(collection.find({}, {"_id": 0}).sort({sort_by: -1 if reverse else 1}))
+
+
+# UPDATE operations
+...
+
+
+# DELETE operations
+...

@@ -33,7 +33,7 @@ def view():
     if data is None:
         raise HTTPException(status_code=500, detail="Failed to fetch patient records.")
 
-    if data == []:
+    if len(data) == 0:
         return {"message": "No patient records found."}
 
     return list(data)
@@ -42,15 +42,15 @@ def view():
 @app.get("/patient/id/{patient_id}")
 def view_patient_by_id(
     patient_id: str = Path(
-        ..., description="Patient ID in the database.", example="P001"
+        ..., description="Patient ID in the database.", examples=["P001"]
     )
 ):
-    data: dict | None = get_patient_by_id(patient_id)
+    data: dict | str | None = get_patient_by_id(patient_id)
 
     if data is None:
         raise HTTPException(status_code=500, detail="Failed to fetch patient record.")
 
-    if data == {}:
+    if isinstance(data, str) != 0:
         raise HTTPException(
             status_code=404, detail=f"Patient with ID : '{patient_id}' not found."
         )
@@ -61,7 +61,7 @@ def view_patient_by_id(
 @app.get("/patient/")
 def view_patients_by_name(
     patient_name: str = Query(
-        ..., description="Patient name in the database.", example="John Doe"
+        ..., description="Patient name in the database.", examples=["John Doe"]
     )
 ):
     data: list[dict] | None = get_patients_by_name(patient_name)
@@ -80,7 +80,7 @@ def view_patients_by_name(
     return data
 
 
-@app.get("/sort")
+@app.get("/patients/sort")
 def sort_patients(
     sort_by: str = Query(
         ...,
