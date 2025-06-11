@@ -4,6 +4,8 @@ from os import environ
 from dotenv import load_dotenv
 from pymongo import MongoClient, errors
 
+from models import Patient, PatientUpdate
+
 load_dotenv()
 
 MONGO_URI: str = environ.get("MONGO_URI", "")
@@ -45,8 +47,27 @@ else:
 # CRUD methods
 
 
-# CREATE operations
-...
+# CREATE operation
+def add_patient(p_data: Patient) -> dict | None:
+    """Creating a new patient record."""
+    if collection is None:
+        return None
+
+    try:
+        temp: dict = p_data.model_dump().copy()
+
+        if "date_of_admission" in temp.keys() and temp["date_of_admission"]:
+            temp["date_of_admission"] = str(temp["date_of_admission"])
+
+        if "date_of_discharge" in temp.keys() and temp["date_of_discharge"]:
+            temp["date_of_discharge"] = str(temp["date_of_discharge"])
+
+        result = collection.insert_one(temp)
+        return temp if result.inserted_id else None
+
+    except Exception as e:
+        print(f"\nError adding patient record : {e}\n")
+        return None
 
 
 # READ operations

@@ -8,7 +8,7 @@ This is a **Patient Management System** microservice powered by [**FastAPI**](ht
 ### 1. Clone
 To clone this repository, run the following command :
 ```bash
-git clone https://github.com/nirmit27/fastapi-demo.git
+git clone https://github.com/nirmit27/pms-backend.git
 ```
 
 ### 2. Environment

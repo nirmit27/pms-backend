@@ -2,8 +2,11 @@
 
 from fastapi import FastAPI, Path, HTTPException, Query
 
-from utils import valid_fields
+from utils import sort_fields, new_pid
+from models import Patient, PatientUpdate
+
 from db import (
+    add_patient,
     get_all_patients,
     get_patient_by_id,
     get_patients_by_name,
@@ -36,6 +39,7 @@ def view():
     if len(data) == 0:
         return {"message": "No patient records found."}
 
+    data.append({"Number of patients": len(data)})
     return list(data)
 
 
@@ -58,7 +62,7 @@ def view_patient_by_id(
     return data
 
 
-@app.get("/patient/")
+@app.get("/patients/name")
 def view_patients_by_name(
     patient_name: str = Query(
         ..., description="Patient name in the database.", examples=["John Doe"]
@@ -88,10 +92,10 @@ def sort_patients(
     ),
     order: str = Query("asc", description="Sort in ascending or descending order."),
 ):
-    if sort_by not in valid_fields:
+    if sort_by not in sort_fields:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid sorting field. Select from {', '.join(valid_fields)}.",
+            detail=f"Invalid sorting field. Select from {', '.join(sort_fields)}.",
         )
 
     if order not in ["asc", "desc"]:
@@ -111,3 +115,26 @@ def sort_patients(
         return {"message": "No patient records found."}
 
     return data
+
+
+@app.post("/new-patient")
+def new_patient(patient_data: dict):
+    try:
+        npid: str | None = new_pid()
+
+        if npid is None:
+            raise Exception("Could not generate a new patient ID.")
+
+        patient_data["pid"] = npid
+        temp: Patient = Patient(**patient_data)
+
+        res = add_patient(temp)
+        if res is None:
+            raise HTTPException(
+                status_code=500, detail=f"Failed to add patient record."
+            )
+        else:
+            return {"message": f"Patient record added successfully. [PID : {npid}]"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error : {e}")
