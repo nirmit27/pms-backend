@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI, Path, HTTPException, Query
 
-from utils import sort_fields, new_pid
+from utils import sort_fields, new_pid, timezone
 from models import Patient, PatientUpdate
 
 from datetime import datetime
@@ -36,7 +36,7 @@ def about():
 def health():
     return {
         "status": "Healthy",
-        "time": f"{datetime.now(tz=tz("Asia/Kolkata")).isoformat()}",
+        "time": f"{datetime.now(tz=tz(timezone)).isoformat()}",
     }
 
 

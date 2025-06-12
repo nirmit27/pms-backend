@@ -10,6 +10,7 @@ from db import collection
 load_dotenv()
 
 # Variables
+timezone: str = "Asia/Kolkata"
 FILEPATH: str = environ.get("FILEPATH", "")
 sort_fields: list[str] = ["height", "weight", "bmi"]
 
