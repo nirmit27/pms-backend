@@ -5,6 +5,9 @@ from fastapi import FastAPI, Path, HTTPException, Query
 from utils import sort_fields, new_pid
 from models import Patient, PatientUpdate
 
+from datetime import datetime
+from pytz import timezone as tz
+
 from db import (
     add_patient,
     get_all_patients,
@@ -27,6 +30,14 @@ def index():
 @app.get("/about")
 def about():
     return {"message": "This is a microservice for managing patient records."}
+
+
+@app.get("/health")
+def health():
+    return {
+        "status": "Healthy",
+        "time": f"{datetime.now(tz=tz("Asia/Kolkata")).isoformat()}",
+    }
 
 
 @app.get("/view")
