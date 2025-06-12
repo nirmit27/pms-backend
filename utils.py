@@ -27,9 +27,14 @@ def load_data() -> dict[str, dict[str, str | int | float]]:
 
 
 def new_pid() -> str | None:
-    """For generating new patient ID."""
+    """For generating a new patient ID."""
     if collection is None:
         return None
 
-    last_pid = collection.find_one(sort=[("pid", -1)])
-    return f"P{int(last_pid['pid'][-1]) + 1:03}" if last_pid is not None else "P001"
+    last_doc = collection.find_one(sort=[("pid", -1)])
+
+    if last_doc is not None:
+        last_pid: int = int(last_doc["pid"][1:])
+        return f"P{last_pid + 1:03}"
+    else:
+        return "P001"

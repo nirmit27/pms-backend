@@ -109,8 +109,44 @@ def sort_records_by_param(sort_by: str, reverse: bool) -> list[dict] | None:
 
 
 # UPDATE operations
-...
+def update_patient(pid: str, updates: PatientUpdate) -> dict | None:
+    """Update a patient record by PID."""
+    if collection is None:
+        return None
+
+    try:
+        update_dict = updates.model_dump(exclude_unset=True)
+
+        if "date_of_admission" in update_dict and update_dict["date_of_admission"]:
+            update_dict["date_of_admission"] = str(update_dict["date_of_admission"])
+
+        if "date_of_discharge" in update_dict and update_dict["date_of_discharge"]:
+            update_dict["date_of_discharge"] = str(update_dict["date_of_discharge"])
+
+        result = collection.update_one({"pid": pid}, {"$set": update_dict})
+
+        if result.modified_count > 0:
+            updated_doc = collection.find_one({"pid": pid})
+
+            if updated_doc and "_id" in dict(updated_doc).keys():
+                updated_doc["_id"] = str(updated_doc["_id"])
+            return updated_doc
+
+        return None
+    except Exception as e:
+        print(f"\nError updating patient record [PID : {pid}] : {e}\n")
+        return None
 
 
 # DELETE operations
-...
+def delete_patient(pid: str) -> bool:
+    """Delete a patient record by PID."""
+    if collection is None:
+        return False
+
+    try:
+        result = collection.delete_one({"pid": pid})
+        return result.deleted_count > 0
+    except Exception as e:
+        print(f"\nError deleting patient record [PID: {pid}] : {e}\n")
+        return False

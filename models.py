@@ -1,14 +1,20 @@
 """Models for data validation"""
 
+from os import environ
+from dotenv import load_dotenv
+
 from pytz import timezone as tz
 from datetime import datetime, date
 
 from typing import Annotated, Literal, Optional
 from pydantic import BaseModel, Field, computed_field, EmailStr
 
+load_dotenv()
+TIMEZONE: str = environ.get("TIMEZONE", "Asia/Kolkata")
+
 
 class Patient(BaseModel):
-    """Model for patient data."""
+    """Model for patient record data validation."""
 
     # Fields to be provided...
     name: Annotated[str, Field(..., description="Name of the patient")]
@@ -72,7 +78,7 @@ class Patient(BaseModel):
     @computed_field
     @property
     def date_of_admission(self) -> str:
-        return str(datetime.now(tz=tz("Asia/Kolkata")).isoformat())
+        return str(datetime.now(tz=tz(TIMEZONE)).isoformat())
 
 
 class PatientUpdate(BaseModel):

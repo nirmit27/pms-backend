@@ -1,8 +1,10 @@
 """Root of the microservice"""
 
+from os import environ
+from dotenv import load_dotenv
 from fastapi import FastAPI, Path, HTTPException, Query
 
-from utils import sort_fields, new_pid, timezone
+from utils import sort_fields, new_pid
 from models import Patient, PatientUpdate
 
 from datetime import datetime
@@ -10,11 +12,16 @@ from pytz import timezone as tz
 
 from db import (
     add_patient,
+    delete_patient,
+    update_patient,
     get_all_patients,
     get_patient_by_id,
     get_patients_by_name,
     sort_records_by_param,
 )
+
+load_dotenv()
+TIMEZONE: str = environ.get("TIMEZONE", "Asia/Kolkata")
 
 app = FastAPI()
 
@@ -36,7 +43,7 @@ def about():
 def health():
     return {
         "status": "Healthy",
-        "time": f"{datetime.now(tz=tz(timezone)).isoformat()}",
+        "time": f"{datetime.now(tz=tz(TIMEZONE)).isoformat()}",
     }
 
 
@@ -147,5 +154,39 @@ def new_patient(patient_data: dict):
         else:
             return {"message": f"Patient record added successfully. [PID : {npid}]"}
 
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error : {e}")
+
+
+@app.put("/update-patient")
+def update_handler(updated_patient_data: dict):
+    try:
+        temp: PatientUpdate = PatientUpdate(**updated_patient_data)
+
+        if not temp.pid:
+            raise HTTPException(status_code=400, detail="Missing 'pid' value in request.")
+
+        updated_record = update_patient(temp.pid, temp)
+        if updated_record:
+            return {
+                "message": f"Patient record [{temp.pid}] updated.",
+                "updated_record": updated_record,
+            }
+        raise HTTPException(
+            status_code=404, detail=f"Patient with ID : '{temp.pid}' not found."
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error : {e}")
+
+
+@app.delete("/delete-patient/{pid}")
+def delete_handler(pid: str):
+    try:
+        if delete_patient(pid):
+            return {"message": f"Patient record [{pid}] has been deleted."}
+        raise HTTPException(
+            status_code=404, detail=f"Patient with ID : '{pid}' not found."
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error : {e}")
