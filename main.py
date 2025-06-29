@@ -2,7 +2,9 @@
 
 from os import environ
 from dotenv import load_dotenv
+
 from fastapi import FastAPI, Path, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 
 from utils import sort_fields, new_pid
 from models import Patient, PatientUpdate
@@ -20,10 +22,23 @@ from db import (
     sort_records_by_param,
 )
 
+# Env. vars.
 load_dotenv()
-TIMEZONE: str = environ.get("TIMEZONE", "Asia/Kolkata")
 
+TIMEZONE: str = environ.get("TIMEZONE", "Asia/Kolkata")
+FRONTEND_URL: str = environ.get("FRONTEND_URL", "http://localhost:5173")
+
+# App. config.
 app = FastAPI()
+
+# CORS policy
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[FRONTEND_URL],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # Route handlers
@@ -164,7 +179,9 @@ def update_handler(updated_patient_data: dict):
         temp: PatientUpdate = PatientUpdate(**updated_patient_data)
 
         if not temp.pid:
-            raise HTTPException(status_code=400, detail="Missing 'pid' value in request.")
+            raise HTTPException(
+                status_code=400, detail="Missing 'pid' value in request."
+            )
 
         updated_record = update_patient(temp.pid, temp)
         if updated_record:
