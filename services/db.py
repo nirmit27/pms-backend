@@ -110,7 +110,7 @@ def sort_records_by_param(sort_by: str, reverse: bool) -> list[dict] | None:
     if collection is None:
         return None
 
-    return list(collection.find({}, {"_id": 0}).sort({sort_by: -1 if reverse else 1}))
+    return list(collection.find({}, {"_id": 0}).sort([(sort_by, -1 if reverse else 1)]))
 
 
 # UPDATE operations

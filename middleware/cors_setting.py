@@ -1,5 +1,5 @@
 """
-CORS configuration
+CORS policy
 """
 
 from os import environ
@@ -13,7 +13,6 @@ FRONTEND_URL: str = environ.get("FRONTEND_URL", "http://localhost:5173")
 
 
 def cors_middleware(app):
-    """Setting up CORS policy."""
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[FRONTEND_URL],

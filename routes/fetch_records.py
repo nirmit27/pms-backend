@@ -1,22 +1,20 @@
 """
-Patient management
+Fetch records
+
+- Router for fetching patient records
 """
 
 from fastapi import APIRouter, Path, HTTPException, Query
 
-from models.models import Patient, PatientUpdate
-from utils.utils import sort_fields, new_pid
+from utils.utils import sort_fields
 from services.db import (
-    add_patient,
-    delete_patient,
-    update_patient,
     get_all_patients,
     get_patient_by_id,
     get_patients_by_name,
     sort_records_by_param,
 )
 
-router = APIRouter(prefix="/patient", tags=["Patients"])
+router = APIRouter(prefix="/records", tags=["Fetch_Records"])
 
 
 @router.get("/")
@@ -29,7 +27,7 @@ def view():
     if len(data) == 0:
         return {"message": "No patient records found."}
 
-    data.append({"Number of patients": len(data)})
+    data.append({"Number of patient(s)": len(data)})
     return list(data)
 
 
@@ -82,6 +80,9 @@ def sort_patients(
     ),
     order: str = Query("asc", description="Sort in ascending or descending order."),
 ):
+    # NOTE: Debugging
+    # print(sort_by, order)
+
     if sort_by not in sort_fields:
         raise HTTPException(
             status_code=400,
@@ -105,62 +106,3 @@ def sort_patients(
         return {"message": "No patient records found."}
 
     return data
-
-
-@router.post("/new")
-def new_patient(patient_data: dict):
-    try:
-        npid: str | None = new_pid()
-
-        if npid is None:
-            raise Exception("Could not generate a new patient ID.")
-
-        patient_data["pid"] = npid
-        temp: Patient = Patient(**patient_data)
-
-        res = add_patient(temp)
-        if res is None:
-            raise HTTPException(
-                status_code=500, detail=f"Failed to add patient record."
-            )
-        else:
-            return {"message": f"Patient record added successfully. [PID : {npid}]"}
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error : {e}")
-
-
-@router.put("/update")
-def update_handler(updated_patient_data: dict):
-    try:
-        temp: PatientUpdate = PatientUpdate(**updated_patient_data)
-
-        if not temp.pid:
-            raise HTTPException(
-                status_code=400, detail="Missing 'pid' value in request."
-            )
-
-        updated_record = update_patient(temp.pid, temp)
-        if updated_record:
-            return {
-                "message": f"Patient record [{temp.pid}] updated.",
-                "updated_record": updated_record,
-            }
-        raise HTTPException(
-            status_code=404, detail=f"Patient with ID : '{temp.pid}' not found."
-        )
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error : {e}")
-
-
-@router.delete("/{pid}")
-def delete_handler(pid: str):
-    try:
-        if delete_patient(pid):
-            return {"message": f"Patient record [{pid}] has been deleted."}
-        raise HTTPException(
-            status_code=404, detail=f"Patient with ID : '{pid}' not found."
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error : {e}")

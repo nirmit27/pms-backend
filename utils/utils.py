@@ -1,8 +1,10 @@
-"""Utility functions and variables"""
+"""
+Utilities
+"""
 
-from json import load
 from os import environ
 from dotenv import load_dotenv
+from json import load
 
 from services.db import collection
 
