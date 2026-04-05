@@ -4,14 +4,14 @@ from json import load
 from os import environ
 from dotenv import load_dotenv
 
-from db import collection
+from services.db import collection
 
 
 load_dotenv()
 
 # Variables
-timezone: str = "Asia/Kolkata"
 FILEPATH: str = environ.get("FILEPATH", "")
+
 sort_fields: list[str] = ["height", "weight", "bmi"]
 
 

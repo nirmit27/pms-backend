@@ -1,4 +1,6 @@
-"""Models for data validation"""
+"""
+Models - Data validation
+"""
 
 from os import environ
 from dotenv import load_dotenv

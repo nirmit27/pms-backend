@@ -1,21 +1,24 @@
-"""Database integration"""
+"""
+DB integration
+"""
 
 from os import environ
 from dotenv import load_dotenv
 from pymongo import MongoClient, errors
 
-from models import Patient, PatientUpdate
+from models.models import Patient, PatientUpdate
 
 load_dotenv()
 
 MONGO_URI: str = environ.get("MONGO_URI", "")
 DB: str = environ.get("DB", "")
 COLLECTION: str = environ.get("COLLECTION", "")
+SERVER_SELECTION_TIMEOUT = environ.get("SERVER_SELECTION_TIMEOUT", 3000)
 
 client, db, collection = None, None, None
 
 
-# Check for missing env. vars.
+# NOTE: Check for missing env. vars.
 
 req_vars: dict[str, str] = {
     "MONGO_URI": MONGO_URI,
@@ -34,7 +37,9 @@ if missing_vars:
     collection = None
 else:
     try:
-        client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=3000)
+        client = MongoClient(
+            MONGO_URI, serverSelectionTimeoutMS=SERVER_SELECTION_TIMEOUT
+        )
         db = client[DB]
         collection = db[COLLECTION]
     except errors.PyMongoError as e:
@@ -44,7 +49,7 @@ else:
         collection = None
 
 
-# CRUD methods
+# CRUD ops.
 
 
 # CREATE operation

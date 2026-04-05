@@ -10,5 +10,8 @@ fastenv
 # Extras
 test.*
 
+/test/*
+/test/**
+
 # Dirs.
 data
