@@ -6,6 +6,7 @@
 
 # Venv
 fastenv
+/.venv
 
 # Extras
 test.*
