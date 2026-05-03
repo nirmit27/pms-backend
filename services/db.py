@@ -4,12 +4,16 @@ DB integration
 
 from os import environ
 from dotenv import load_dotenv
+
 from pymongo import MongoClient, errors
+from pytz import timezone as tz
+from datetime import datetime, timedelta
 
 from models.models import Patient, PatientUpdate
 
 load_dotenv()
 
+TIMEZONE: str = environ.get("TIMEZONE", "Asia/Kolkata")
 MONGO_URI: str = environ.get("MONGO_URI", "")
 DB: str = environ.get("DB", "")
 COLLECTION: str = environ.get("COLLECTION", "")
@@ -105,12 +109,61 @@ def get_patients_by_name(name: str) -> list[dict] | None:
     return list(collection.find({"name": name}, {"_id": 0}))
 
 
+def get_patients_by_name_fuzzy(name: str) -> list[dict] | None:
+    """Retrieves patient records with fuzzy name matching.
+    Returns results sorted by relevance (exact matches first, then partial matches).
+    """
+    if collection is None:
+        return None
+
+    if not name.strip():
+        return []
+
+    # NOTE: Create a case-insensitive regex pattern for partial matching
+    pattern = f".*{name}.*"
+
+    results = list(
+        collection.find({"name": {"$regex": pattern, "$options": "i"}}, {"_id": 0})
+    )
+
+    # NOTE: Sort results by relevance (exact match first, then by length of name)
+    results.sort(
+        key=lambda x: (
+            not x["name"].lower() == name.lower(),  # Exact matches first
+            len(x["name"]),  # Then shorter names (more likely exact matches)
+        )
+    )
+
+    return results
+
+
 def sort_records_by_param(sort_by: str, reverse: bool) -> list[dict] | None:
     """Retrieves patient records sorted by given parameter value in specified order."""
     if collection is None:
         return None
 
     return list(collection.find({}, {"_id": 0}).sort([(sort_by, -1 if reverse else 1)]))
+
+
+def get_recent_admissions() -> list[dict] | None:
+    """Retrieves patient records admitted within the last 24 hours."""
+    if collection is None:
+        return None
+
+    try:
+        ts_prev_day = datetime.now(tz=tz(TIMEZONE)) - timedelta(days=1)
+
+        # NOTE: Query for records where date_of_admission is greater than or equal to 24 hours ago
+        results = list(
+            collection.find(
+                {"date_of_admission": {"$gte": ts_prev_day.isoformat()}},
+                {"_id": 0},
+            )
+        )
+        return results
+    except Exception as e:
+        print(f"\nError fetching recent admissions: {e}\n")
+        return None
 
 
 # UPDATE operations

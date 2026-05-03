@@ -11,7 +11,9 @@ from services.db import (
     get_all_patients,
     get_patient_by_id,
     get_patients_by_name,
+    get_recent_admissions,
     sort_records_by_param,
+    get_patients_by_name_fuzzy,
 )
 
 router = APIRouter(prefix="/records", tags=["Fetch_Records"])
@@ -70,6 +72,46 @@ def view_patients_by_name(
         )
 
     return data
+
+
+@router.get("/name/search")
+def search_patients_by_name_fuzzy(
+    patient_name: str = Query(
+        ...,
+        description="Patient name (partial match with fuzzy search).",
+        examples=["John"],
+    )
+):
+    """
+    Fuzzy search for patients by name.
+    Returns partial matches sorted by relevance (exact matches first).
+    Case-insensitive matching.
+    """
+    if not patient_name or not patient_name.strip():
+        raise HTTPException(status_code=400, detail="Patient name cannot be empty.")
+
+    data: list[dict] | None = get_patients_by_name_fuzzy(patient_name)
+
+    if data is None:
+        raise HTTPException(
+            status_code=500, detail="Failed to fetch patient record(s)."
+        )
+
+    # Return empty list instead of 404 for fuzzy search (for autocomplete UX)
+    return data
+
+
+@router.get("/recent-admissions")
+def get_recent_admissions_count():
+    """
+    Returns the number of patients admitted in the last 24 hours.
+    """
+    data: list[dict] | None = get_recent_admissions()
+
+    if data is None:
+        raise HTTPException(status_code=500, detail="Failed to fetch recent patient admissions.")
+
+    return {"count": len(data)}
 
 
 @router.get("/sort")

@@ -46,7 +46,7 @@ class Patient(BaseModel):
         Optional[EmailStr], Field(None, description="Email ID of the patient")
     ]
 
-    # Fields to be computed...
+    # Computed field(s)
     @computed_field
     @property
     def bmi(self) -> float:
@@ -118,3 +118,35 @@ class PatientUpdate(BaseModel):
     email: Annotated[
         Optional[EmailStr], Field(None, description="Email ID of the patient")
     ]
+
+    @computed_field
+    @property
+    def bmi(self) -> Optional[float]:
+        if self.height and self.weight:
+            return round(self.weight / (self.height**2), 2)
+        return None
+
+    # Computed field(s)
+    @computed_field
+    @property
+    def verdict(self) -> str:
+        verdict: str = ""
+
+        if self.bmi < 16.0:
+            verdict = "Severely Underweight"
+        elif self.bmi < 17.0:
+            verdict = "Moderately Underweight"
+        elif self.bmi < 18.5:
+            verdict = "Underweight"
+        elif self.bmi < 25.0:
+            verdict = "Normal Weight"
+        elif self.bmi < 30.0:
+            verdict = "Overweight"
+        elif self.bmi < 35.0:
+            verdict = "Moderately Obese"
+        elif self.bmi < 40.0:
+            verdict = "Severely Obese"
+        else:
+            verdict = "Very Severely Obese"
+
+        return verdict
