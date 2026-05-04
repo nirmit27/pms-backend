@@ -208,3 +208,54 @@ def delete_patient(pid: str) -> bool:
     except Exception as e:
         print(f"\nError deleting patient record [PID: {pid}] : {e}\n")
         return False
+
+
+# ACTIVITY LOGGING
+
+activity_collection = None
+
+if client is not None and db is not None:
+    try:
+        activity_collection = db["activities"]
+    except Exception as e:
+        print(f"\nError setting up activities collection: {e}\n")
+
+
+def log_activity(
+    action_type: str,
+    patient_id: str = "",
+    patient_name: str = "",
+    description: str = "",
+) -> bool:
+    """Log an activity to the activity collection."""
+    if activity_collection is None:
+        return False
+
+    try:
+        activity_doc = {
+            "action_type": action_type,
+            "patient_id": patient_id,
+            "patient_name": patient_name,
+            "description": description,
+            "timestamp": str(datetime.now(tz=tz(TIMEZONE)).isoformat()),
+        }
+        result = activity_collection.insert_one(activity_doc)
+        return result.inserted_id is not None
+    except Exception as e:
+        print(f"\nError logging activity: {e}\n")
+        return False
+
+
+def get_recent_activities(limit: int = 10) -> list[dict] | None:
+    """Retrieve recent activities sorted by timestamp (newest first)."""
+    if activity_collection is None:
+        return None
+
+    try:
+        results = list(
+            activity_collection.find({}, {"_id": 0}).sort("timestamp", -1).limit(limit)
+        )
+        return results
+    except Exception as e:
+        print(f"\nError fetching recent activities: {e}\n")
+        return None

@@ -12,7 +12,7 @@ from routes.add_records import router as admit_patient_router
 from routes.fetch_records import router as fetch_records_router
 from routes.update_records import router as update_records_router
 from routes.rem_records import router as discharge_patient_router
-
+from routes.activities import router as activities_router
 
 # App.
 app = FastAPI(
@@ -34,3 +34,6 @@ app.include_router(fetch_records_router)
 app.include_router(admit_patient_router)
 app.include_router(update_records_router)
 app.include_router(discharge_patient_router)
+
+# Activities
+app.include_router(activities_router)

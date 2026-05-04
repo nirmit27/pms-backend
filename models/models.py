@@ -131,6 +131,8 @@ class PatientUpdate(BaseModel):
     @property
     def verdict(self) -> str:
         verdict: str = ""
+        if self.bmi is None:
+            return "NA"
 
         if self.bmi < 16.0:
             verdict = "Severely Underweight"
@@ -150,3 +152,31 @@ class PatientUpdate(BaseModel):
             verdict = "Very Severely Obese"
 
         return verdict
+
+
+class Activity(BaseModel):
+    """Model for activity log entries."""
+
+    action_type: Annotated[
+        Literal[
+            "patient_admitted", "patient_updated", "patient_discharged", "system_check"
+        ],
+        Field(..., description="Type of action performed by user"),
+    ]
+    patient_id: Annotated[
+        Optional[str], Field(None, description="Patient ID (if applicable)")
+    ]
+    patient_name: Annotated[
+        Optional[str], Field(None, description="Patient name (if applicable)")
+    ]
+    description: Annotated[
+        str, Field(..., description="Human-readable description of the activity")
+    ]
+    timestamp: Annotated[
+        Optional[str], Field(None, description="When the activity occurred")
+    ] = None
+
+    def __init__(self, **data):
+        if "timestamp" not in data or data["timestamp"] is None:
+            data["timestamp"] = str(datetime.now(tz=tz(TIMEZONE)).isoformat())
+        super().__init__(**data)
