@@ -97,7 +97,6 @@ def search_patients_by_name_fuzzy(
             status_code=500, detail="Failed to fetch patient record(s)."
         )
 
-    # Return empty list instead of 404 for fuzzy search (for autocomplete UX)
     return data
 
 
@@ -122,9 +121,6 @@ def sort_patients(
     ),
     order: str = Query("asc", description="Sort in ascending or descending order."),
 ):
-    # NOTE: Debugging
-    # print(sort_by, order)
-
     if sort_by not in sort_fields:
         raise HTTPException(
             status_code=400,

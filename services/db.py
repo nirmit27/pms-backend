@@ -211,7 +211,6 @@ def delete_patient(pid: str) -> bool:
 
 
 # ACTIVITY LOGGING
-
 activity_collection = None
 
 if client is not None and db is not None:
