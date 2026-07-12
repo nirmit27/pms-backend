@@ -4,9 +4,10 @@ App. - Root
 
 from fastapi import FastAPI
 
-from middleware.cors_setting import cors_middleware
+from config.cors_setting import cors_middleware
 
 from routes.health import router as health_router
+from routes.auth import router as auth_router
 
 from routes.add_records import router as admit_patient_router
 from routes.fetch_records import router as fetch_records_router
@@ -17,7 +18,7 @@ from routes.activities import router as activities_router
 # App.
 app = FastAPI(
     title="Patient Management System 🏥",
-    description="A microservice for managing patient records.",
+    description="A microservice for management of patient records.",
     version="1.2.0",
 )
 
@@ -37,3 +38,6 @@ app.include_router(discharge_patient_router)
 
 # Activities
 app.include_router(activities_router)
+
+# Authentication
+app.include_router(auth_router)

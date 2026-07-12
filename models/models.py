@@ -11,6 +11,8 @@ from datetime import datetime, date
 from typing import Annotated, Literal, Optional
 from pydantic import BaseModel, Field, computed_field, EmailStr
 
+from models.roles import Role
+
 load_dotenv()
 TIMEZONE: str = environ.get("TIMEZONE", "Asia/Kolkata")
 
@@ -180,3 +182,14 @@ class Activity(BaseModel):
         if "timestamp" not in data or data["timestamp"] is None:
             data["timestamp"] = str(datetime.now(tz=tz(TIMEZONE)).isoformat())
         super().__init__(**data)
+
+
+class User(BaseModel):
+    """Model for RBAC."""
+
+    id: str
+    username: str
+    email: str
+    password_hash: str
+    role: Role
+    is_active: bool = True

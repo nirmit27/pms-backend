@@ -4,15 +4,25 @@ Remove records
 - Router for removing patient records
 """
 
-from fastapi import APIRouter, HTTPException
+from typing import Annotated
 
+from fastapi import APIRouter, Depends, HTTPException
+
+from auth.dependencies import get_current_user, require_permission
+from models.models import User
+from models.permissions import Permission
 from services.db import delete_patient, get_patient_by_id, log_activity
 
 router = APIRouter(prefix="/discharge", tags=["Discharge_Patients"])
 
 
-@router.delete("/{pid}")
-def delete_handler(pid: str):
+@router.delete(
+    "/{pid}", dependencies=[Depends(require_permission(Permission.DISCHARGE_PATIENT))]
+)
+def delete_handler(
+    pid: str,
+    current_user: Annotated[User, Depends(get_current_user)],
+):
     try:
         # Get patient info before deletion for logging
         patient_info = get_patient_by_id(pid)

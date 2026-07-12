@@ -1,7 +1,10 @@
-fastapi
-uvicorn
-pydantic
-fastapi[standard]
-pymongo
 pytz
+pyjwt
+pwdlib
+pwdlib[argon2]
+pymongo
+pydantic
+uvicorn
+fastapi
+fastapi[standard]
 databricks-sql-connector

@@ -6,7 +6,7 @@ from os import environ
 from dotenv import load_dotenv
 from json import load
 
-from services.db import collection
+from services.db import records_collection
 
 
 load_dotenv()
@@ -30,10 +30,10 @@ def load_data() -> dict[str, dict[str, str | int | float]]:
 
 def new_pid() -> str | None:
     """For generating a new patient ID."""
-    if collection is None:
+    if records_collection is None:
         return None
 
-    last_doc = collection.find_one(sort=[("pid", -1)])
+    last_doc = records_collection.find_one(sort=[("pid", -1)])
 
     if last_doc is not None:
         last_pid: int = int(last_doc["pid"][1:])

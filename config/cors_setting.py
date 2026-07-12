@@ -2,14 +2,14 @@
 CORS policy
 """
 
-from os import environ
+from os import getenv
 from dotenv import load_dotenv
 
 from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
-FRONTEND_URL: str = environ.get("FRONTEND_URL", "http://localhost:5173")
+FRONTEND_URL: str = getenv("FRONTEND_URL", "http://localhost:5173")
 
 
 def cors_middleware(app):

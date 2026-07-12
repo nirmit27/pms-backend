@@ -1,3 +1,5 @@
 """
-Services module
+Services
+
+- Module for handling backend service(s).
 """
